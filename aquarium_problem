@@ -1,0 +1,68 @@
+#!/usr/bin/ruby
+
+KnapsackItem = Struct.new(:name, :cost, :inches)
+potential_items = [
+  KnapsackItem['Zebra(4)',   4, 6],              
+  KnapsackItem['Zebra(5)',   5, 7.5],              
+  KnapsackItem['Zebra(6)',   6, 9],              
+  KnapsackItem['Zebra(7)',   7, 10.5],              
+  KnapsackItem['Zebra(8)',   8, 12],              
+  KnapsackItem['Zebra(9)',   9, 13.5],              
+  KnapsackItem['Zebra(10)',  10, 15],              
+  KnapsackItem['Hatchet(4)', 4, 8],
+  KnapsackItem['Hatchet(5)', 5, 10],
+  KnapsackItem['Hatchet(6)', 6, 12],
+  KnapsackItem['Hatchet(7)', 7, 14],
+  KnapsackItem['Hatchet(8)', 8, 16],
+  KnapsackItem['Hatchet(9)', 9, 18],
+  KnapsackItem['Guppy(2)',   6, 8],
+  KnapsackItem['Guppy(3)',   9, 12],
+  KnapsackItem['Guppy(4)',   12, 16],
+  KnapsackItem['Guppy(5)',   15, 20],
+  KnapsackItem['Guppy(6)',   18, 24],
+  KnapsackItem['Cave(4)',    8, 12],
+  KnapsackItem['Cave(5)',    10, 15],
+  KnapsackItem['Cave(6)',    12, 18],
+  KnapsackItem['Cave(7)',    14, 21],
+  KnapsackItem['Ramirez(2)', 10, 4], 
+  KnapsackItem['Ramirez(4)', 20, 8], 
+]
+
+acquarium_capacity = 30
+total_cash = 25
+ 
+class Array
+  # do something for each element of the array's power set
+  def power_set
+    yield [] if block_given?
+    self.inject([[]]) do |ps, elem|
+      ps.each_with_object([]) do |i,r|
+        r << i
+        new_subset = i + [elem]
+        yield new_subset if block_given?
+        r << new_subset
+      end
+    end
+  end
+end
+ 
+maxval, solutions = potential_items.power_set.group_by {|subset|
+  inches = subset.inject(0) {|w, elem| w + elem.inches}
+  inches>acquarium_capacity ? 0 : subset.inject(0){|v, elem| v + elem.cost}
+}.each do |val, solutions|
+ 
+  #if val <26 and val > 23
+  if val == 25
+    solutions.each do |set|
+      wt, items = 0, []
+      set.each {|elem| wt += elem.inches; items << elem.name}
+      #if wt < 31 and wt > 28.9
+      if wt == 30
+        puts "====================="
+        puts "cost: #{val}"
+        puts "inches: #{wt}"
+        puts "items: #{items.join(',')}"
+      end
+    end
+  end
+end
